@@ -3,6 +3,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 
 class SpaceInvaders:
@@ -21,6 +22,8 @@ class SpaceInvaders:
         pygame.display.set_caption("Space Invaders, Author: Saleh Akram")
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        self._create_fleet()
 
     def run_game(self):
         """start main game loop"""
@@ -74,12 +77,19 @@ class SpaceInvaders:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _create_fleet(self):
+        alien = Alien(self)
+        self.aliens.add(alien)
+
     def _update_screen(self):
         self.screen.fill(self.settings.screen_bg_color)
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.ship.blitme()
+        self.aliens.draw(self.screen)
         pygame.display.flip()
+
+
 
 
 if __name__ == "__main__":
