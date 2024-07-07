@@ -31,6 +31,7 @@ class SpaceInvaders:
             self._check_events()
             self.ship.update()
             self._update_bullets()
+            self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
 
@@ -77,9 +78,30 @@ class SpaceInvaders:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+    def _update_aliens(self):
+        self.aliens.update()
+
     def _create_fleet(self):
+        # Spacing between alien is one alien width, and one alien height
         alien = Alien(self)
-        self.aliens.add(alien)
+        alien_width, alien_height = alien.rect.size
+
+        current_x, current_y = alien_width, alien_height
+        while current_y < (self.settings.screen_height - 3 * alien_height):
+            while current_x < (self.settings.screen_width - 2 * alien_width):
+                self._create_alien(current_x, current_y)
+                current_x += 2 * alien_width
+            # finished row, reset the x value and increment y value
+            current_x = alien_width
+            current_y += 2 * alien_height
+
+    def _create_alien(self, x_position, y_position):
+        """Create an alien and place it in a row"""
+        new_alien = Alien(self)
+        new_alien.x = x_position
+        new_alien.rect.x = x_position
+        new_alien.rect.y = y_position
+        self.aliens.add(new_alien)
 
     def _update_screen(self):
         self.screen.fill(self.settings.screen_bg_color)
@@ -88,8 +110,6 @@ class SpaceInvaders:
         self.ship.blitme()
         self.aliens.draw(self.screen)
         pygame.display.flip()
-
-
 
 
 if __name__ == "__main__":
