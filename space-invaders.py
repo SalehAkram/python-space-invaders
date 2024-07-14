@@ -79,6 +79,7 @@ class SpaceInvaders:
                 self.bullets.remove(bullet)
 
     def _update_aliens(self):
+        self.check_fleet_edges()
         self.aliens.update()
 
     def _create_fleet(self):
@@ -102,6 +103,19 @@ class SpaceInvaders:
         new_alien.rect.x = x_position
         new_alien.rect.y = y_position
         self.aliens.add(new_alien)
+
+    def check_fleet_edges(self):
+        """as soon as one of the alien touches the edge, the fleet drops and changes direction
+        you cant just check the aliens on the right or left most edges, incase you shot them down"""
+        for alien in self.aliens:
+            if alien.check_edges():
+                self.change_fleet_direction()
+                break
+
+    def change_fleet_direction(self):
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1
 
     def _update_screen(self):
         self.screen.fill(self.settings.screen_bg_color)
