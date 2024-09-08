@@ -80,7 +80,6 @@ class SpaceInvaders:
         # check for any bullets that have hit an alien
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
-
     def _update_aliens(self):
         self.check_fleet_edges()
         self.aliens.update()
