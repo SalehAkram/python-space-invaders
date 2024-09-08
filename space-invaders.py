@@ -26,7 +26,7 @@ class SpaceInvaders:
         self._create_fleet()
 
     def run_game(self):
-        """start main game loop"""
+        """start the main game loop"""
         while True:
             self._check_events()
             self.ship.update()
@@ -69,7 +69,7 @@ class SpaceInvaders:
             self.bullets.add(new_bullet)
 
     def _update_bullets(self):
-        """Update position of bullets and get rid of old bullets."""
+        """Update the position of bullets and get rid of old bullets."""
         # Update bullet positions.
         self.bullets.update()
 
@@ -77,6 +77,9 @@ class SpaceInvaders:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
+        # check for any bullets that have hit an alien
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+
 
     def _update_aliens(self):
         self.check_fleet_edges()
@@ -105,7 +108,7 @@ class SpaceInvaders:
         self.aliens.add(new_alien)
 
     def check_fleet_edges(self):
-        """as soon as one of the alien touches the edge, the fleet drops and changes direction
+        """as soon as one of the alien touches the edge, the fleet it drops and changes a direction
         you cant just check the aliens on the right or left most edges, incase you shot them down"""
         for alien in self.aliens:
             if alien.check_edges():
