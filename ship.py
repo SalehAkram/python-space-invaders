@@ -15,6 +15,10 @@ class Ship:
         self.moving_left = False
         self.settings = si_game.settings
 
+    def center_ship(self):
+        self.rect.midbottom = self.screen_rect.midbottom
+        self.x = float(self.rect.x)
+
     def blitme(self):
         self.screen.blit(self.image, self.rect)
 

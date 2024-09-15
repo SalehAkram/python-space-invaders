@@ -4,6 +4,9 @@ from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from super_bullets import SuperBullet
+from time import sleep
+from game_stats import GameStats
 
 
 class SpaceInvaders:
@@ -20,17 +23,19 @@ class SpaceInvaders:
         # self.settings.screen_width = self.screen.get_rect().width
         # self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Space Invaders, Author: Saleh Akram")
+        self.stats = GameStats(self)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
+        self.use_super_bullets = True
 
     def run_game(self):
         """start the main game loop"""
         while True:
             self._check_events()
             self.ship.update()
-            self._update_bullets()
+            self._update_bullets(self.use_super_bullets)
             self._update_aliens()
             self._update_screen()
             self.clock.tick(60)
@@ -53,7 +58,10 @@ class SpaceInvaders:
         elif event.key == pygame.K_q:
             sys.exit()
         elif event.key == pygame.K_SPACE:
-            self.fire_bullet()
+            if self.use_super_bullets:
+                self.fire_super_bullet()
+            else:
+                self.fire_bullet()
 
     def _check_keyup_events(self, event):
         """respond to key release"""
@@ -68,7 +76,12 @@ class SpaceInvaders:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
 
-    def _update_bullets(self):
+    def fire_super_bullet(self):
+        if len(self.bullets) < self.settings.super_bullets_allowed:
+            new_bullet = SuperBullet(self)
+            self.bullets.add(new_bullet)
+
+    def _update_bullets(self, super_bullets: bool):
         """Update the position of bullets and get rid of old bullets."""
         # Update bullet positions.
         self.bullets.update()
@@ -77,12 +90,30 @@ class SpaceInvaders:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
-        # check for any bullets that have hit an alien
-        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        self.check_bullet_alien_collisions()
+
+    def check_bullet_alien_collisions(self):
+        """Respond to bullet and alien collision"""
+        collision = pygame.sprite.groupcollide(self.bullets, self.aliens, not self.use_super_bullets, True)
+        # Destroy the existing bullet and create a new fleet
+        if not self.aliens:
+            self.bullets.empty()
+            self._create_fleet()
 
     def _update_aliens(self):
         self.check_fleet_edges()
         self.aliens.update()
+        # check for alien and ship collision
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._ship_hit()
+
+    def _ship_hit(self):
+        self.stats.ships_left -= 1
+        self.bullets.empty()
+        self.aliens.empty()
+        self._create_fleet()
+        self.ship.center_ship()
+        sleep(0.5)
 
     def _create_fleet(self):
         # Spacing between alien is one alien width, and one alien height
