@@ -7,7 +7,7 @@ from alien import Alien
 from super_bullets import SuperBullet
 from time import sleep
 from game_stats import GameStats
-
+from button import Button
 
 class SpaceInvaders:
     """Overall class to manage the game"""
@@ -29,7 +29,8 @@ class SpaceInvaders:
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
         self.use_super_bullets = True
-        self.game_over = False
+        self.game_over = True
+        self.play_button = Button(self, "Play")
 
     def run_game(self):
         """start the main game loop"""
@@ -170,6 +171,8 @@ class SpaceInvaders:
             bullet.draw_bullet()
         self.ship.blitme()
         self.aliens.draw(self.screen)
+        if self.game_over:
+            self.play_button.draw_button()
         pygame.display.flip()
 
 
